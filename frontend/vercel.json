@@ -1,9 +1,11 @@
 {
-  "version": 2,
+  "env": {
+    "REACT_APP_API_URL": "https://backend-production-4613.up.railway.app"
+  },
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/node"
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
@@ -15,8 +17,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "REACT_APP_API_URL": "@api_url"
-  }
+  ]
 } 
