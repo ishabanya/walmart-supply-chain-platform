@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
+import { AppBar, Toolbar, Typography } from '@mui/material';
 
 // Components
 import Navbar from './components/Navbar';
@@ -14,6 +15,7 @@ import Deliveries from './pages/Deliveries';
 import Analytics from './pages/Analytics';
 import Suppliers from './pages/Suppliers';
 import QuantumSupplyChain from './pages/QuantumSupplyChain';
+import BlockchainSupplyChain from './pages/BlockchainSupplyChain';
 import Login from './pages/Login';
 
 // Context
@@ -117,89 +119,29 @@ function App() {
       <AuthProvider>
         <WebSocketProvider>
           <Router>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/inventory"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Inventory />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/orders"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Orders />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/deliveries"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Deliveries />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/analytics"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Analytics />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/suppliers"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Suppliers />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/quantum"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <QuantumSupplyChain />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
+            <div className="App">
+              <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                <Toolbar>
+                  <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    Walmart Supply Chain Platform
+                  </Typography>
+                </Toolbar>
+              </AppBar>
+              <Box sx={{ display: 'flex' }}>
+                <Sidebar />
+                <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: '64px' }}>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/orders" element={<Orders />} />
+                    <Route path="/suppliers" element={<Suppliers />} />
+                    <Route path="/deliveries" element={<Deliveries />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/quantum" element={<QuantumSupplyChain />} />
+                    <Route path="/blockchain" element={<BlockchainSupplyChain />} />
+                  </Routes>
+                </Box>
+              </Box>
+            </div>
           </Router>
         </WebSocketProvider>
       </AuthProvider>

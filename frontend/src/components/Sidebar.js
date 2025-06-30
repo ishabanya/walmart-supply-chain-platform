@@ -18,6 +18,7 @@ import {
   Analytics as AnalyticsIcon,
   Business as SuppliersIcon,
   Psychology as QuantumIcon,
+  Link as LinkIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -32,6 +33,7 @@ const menuItems = [
   { text: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
   { text: 'Suppliers', icon: <SuppliersIcon />, path: '/suppliers' },
   { text: 'Quantum Supply Chain', icon: <QuantumIcon />, path: '/quantum' },
+  { text: 'Blockchain Supply Chain', icon: <LinkIcon />, path: '/blockchain' },
 ];
 
 const Sidebar = ({ open }) => {
