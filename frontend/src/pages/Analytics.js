@@ -26,7 +26,6 @@ import {
   TrendingUp,
   Analytics as AnalyticsIcon,
   Speed,
-  PredictiveText,
   Lightbulb,
   Warning,
   CheckCircle,
@@ -245,7 +244,7 @@ const Analytics = () => {
       opportunity: <Lightbulb sx={{ color: '#ffc220' }} />,
       warning: <Warning sx={{ color: '#ff6600' }} />,
       success: <CheckCircle sx={{ color: '#4caf50' }} />,
-      forecast: <PredictiveText sx={{ color: '#004c91' }} />
+      forecast: <Timeline sx={{ color: '#004c91' }} />
     };
     return icons[type] || <AnalyticsIcon />;
   };
