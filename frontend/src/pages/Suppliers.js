@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container,
   Typography,
@@ -53,7 +53,7 @@ import {
   CheckCircle,
   Warning,
 } from '@mui/icons-material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import axios from 'axios';
 
 const Suppliers = () => {
@@ -81,7 +81,7 @@ const Suppliers = () => {
 
   useEffect(() => {
     filterSuppliers();
-  }, [suppliers, searchTerm, categoryFilter, statusFilter]);
+  }, [filterSuppliers]);
 
   const fetchSuppliers = async () => {
     try {
@@ -134,7 +134,7 @@ const Suppliers = () => {
     }
   };
 
-  const filterSuppliers = () => {
+  const filterSuppliers = useCallback(() => {
     let filtered = suppliers;
 
     if (searchTerm) {
@@ -156,7 +156,7 @@ const Suppliers = () => {
     }
 
     setFilteredSuppliers(filtered);
-  };
+  }, [suppliers, searchTerm, categoryFilter, statusFilter]);
 
   const getStatusColor = (status) => {
     const colors = {
@@ -175,12 +175,7 @@ const Suppliers = () => {
     return '#f44336';
   };
 
-  const getPerformanceLabel = (score) => {
-    if (score >= 90) return 'Excellent';
-    if (score >= 80) return 'Good';
-    if (score >= 70) return 'Fair';
-    return 'Poor';
-  };
+
 
   const handleViewSupplier = (supplier) => {
     setSelectedSupplier(supplier);
