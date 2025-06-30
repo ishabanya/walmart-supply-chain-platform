@@ -26,11 +26,18 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await login(credentials);
+    setError('');
+    
+    console.log('🚀 Login form submitted:', credentials);
+    
+    const result = await login(credentials.username, credentials.password);
+    
+    if (result.success) {
+      console.log('✅ Login successful, navigating to dashboard');
       navigate('/dashboard');
-    } catch (err) {
-      setError('Invalid username or password');
+    } else {
+      console.error('❌ Login failed:', result.error);
+      setError(result.error || 'Invalid username or password');
     }
   };
 

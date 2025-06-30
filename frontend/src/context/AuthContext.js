@@ -32,11 +32,15 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
+      console.log('🔐 Attempting login with:', { username, apiUrl: axios.defaults.baseURL });
+      
       const response = await axios.post('/auth/login', {
         username,
         password,
       });
 
+      console.log('✅ Login successful:', response.data);
+      
       // eslint-disable-next-line no-unused-vars
       const { access_token, token_type: _token_type, user_type } = response.data;
       
@@ -52,7 +56,17 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          baseURL: error.config?.baseURL,
+          method: error.config?.method
+        }
+      });
       return { 
         success: false, 
         error: error.response?.data?.detail || 'Login failed' 
