@@ -87,7 +87,7 @@ const Login = () => {
           </Box>
           
           <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
-            Demo credentials: admin / password
+            Demo credentials: admin / walmart123
           </Typography>
         </Paper>
       </Box>

@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
+// Configure axios base URL for production
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://backend-production-4613.up.railway.app';
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
