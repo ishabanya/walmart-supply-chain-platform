@@ -34,7 +34,8 @@ export const AuthProvider = ({ children }) => {
         password,
       });
 
-      const { access_token, token_type, user_type } = response.data;
+      // eslint-disable-next-line no-unused-vars
+      const { access_token, token_type: _token_type, user_type } = response.data;
       
       // Store token and user info
       localStorage.setItem('token', access_token);

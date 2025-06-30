@@ -15,7 +15,6 @@ import {
 import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
-  AccountCircle,
   Logout,
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
