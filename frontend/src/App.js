@@ -21,6 +21,7 @@ import Login from './pages/Login';
 // Context
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WebSocketProvider } from './context/WebSocketContext';
+import { BlockchainProvider } from './context/BlockchainContext';
 
 // Create theme
 const theme = createTheme({
@@ -118,7 +119,8 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <WebSocketProvider>
-          <Router>
+          <BlockchainProvider>
+            <Router>
             <div className="App">
               <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                 <Toolbar>
@@ -143,6 +145,7 @@ function App() {
               </Box>
             </div>
           </Router>
+            </BlockchainProvider>
         </WebSocketProvider>
       </AuthProvider>
     </ThemeProvider>

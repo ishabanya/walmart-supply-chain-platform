@@ -460,4 +460,225 @@ class AlertLog(Base):
     resolved_by = Column(String(100))
     
     created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now()) 
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+# Blockchain Models
+class BlockchainNetwork(Base):
+    __tablename__ = "blockchain_networks"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)  # Ethereum, Polygon, BSC
+    chain_id = Column(Integer, nullable=False)
+    rpc_url = Column(String(500), nullable=False)
+    explorer_url = Column(String(500))
+    native_currency = Column(String(20))  # ETH, MATIC, BNB
+    
+    is_active = Column(Boolean, default=True)
+    is_testnet = Column(Boolean, default=False)
+    
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    smart_contracts = relationship("SmartContract", back_populates="network")
+    blockchain_transactions = relationship("BlockchainTransaction", back_populates="network")
+
+class SmartContract(Base):
+    __tablename__ = "smart_contracts"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    contract_address = Column(String(42), nullable=False)  # Ethereum address
+    network_id = Column(Integer, ForeignKey("blockchain_networks.id"))
+    
+    # Contract details
+    abi = Column(JSON)  # Application Binary Interface
+    bytecode = Column(Text)
+    contract_type = Column(String(50))  # SUPPLY_CHAIN, TOKEN, NFT
+    
+    # Deployment details
+    deployed_at = Column(DateTime)
+    deployed_by = Column(String(42))  # Ethereum address
+    deployment_tx_hash = Column(String(66))
+    
+    # Status
+    is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
+    
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    network = relationship("BlockchainNetwork", back_populates="smart_contracts")
+    blockchain_transactions = relationship("BlockchainTransaction", back_populates="smart_contract")
+
+class BlockchainTransaction(Base):
+    __tablename__ = "blockchain_transactions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    tx_hash = Column(String(66), unique=True, nullable=False)
+    network_id = Column(Integer, ForeignKey("blockchain_networks.id"))
+    smart_contract_id = Column(Integer, ForeignKey("smart_contracts.id"))
+    
+    # Transaction details
+    from_address = Column(String(42), nullable=False)
+    to_address = Column(String(42), nullable=False)
+    function_name = Column(String(100))
+    function_parameters = Column(JSON)
+    
+    # Transaction status
+    status = Column(String(20), default="PENDING")  # PENDING, CONFIRMED, FAILED
+    block_number = Column(Integer)
+    block_hash = Column(String(66))
+    gas_used = Column(Integer)
+    gas_price = Column(String(50))  # Wei amount as string
+    transaction_fee = Column(String(50))  # Wei amount as string
+    
+    # Business context
+    entity_type = Column(String(50))  # PRODUCT, ORDER, SHIPMENT
+    entity_id = Column(Integer)
+    action_type = Column(String(50))  # CREATE, UPDATE, TRANSFER, VERIFY
+    
+    # Timing
+    submitted_at = Column(DateTime, default=func.now())
+    confirmed_at = Column(DateTime)
+    
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    network = relationship("BlockchainNetwork", back_populates="blockchain_transactions")
+    smart_contract = relationship("SmartContract", back_populates="blockchain_transactions")
+
+class DigitalProduct(Base):
+    __tablename__ = "digital_products"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    inventory_item_id = Column(Integer, ForeignKey("inventory_items.id"))
+    
+    # Blockchain identifiers
+    token_id = Column(Integer)  # NFT token ID
+    contract_address = Column(String(42))
+    blockchain_id = Column(String(100))  # Unique blockchain identifier
+    
+    # Product authenticity
+    digital_signature = Column(Text)
+    authenticity_hash = Column(String(66))
+    
+    # Tracking
+    current_owner = Column(String(42))  # Ethereum address
+    origin_timestamp = Column(DateTime)
+    
+    # Supply chain stages
+    manufacturing_verified = Column(Boolean, default=False)
+    manufacturing_timestamp = Column(DateTime)
+    manufacturing_location = Column(String(255))
+    
+    distribution_verified = Column(Boolean, default=False)
+    distribution_timestamp = Column(DateTime)
+    distribution_location = Column(String(255))
+    
+    retail_verified = Column(Boolean, default=False)
+    retail_timestamp = Column(DateTime)
+    retail_location = Column(String(255))
+    
+    # Verification
+    is_authentic = Column(Boolean, default=True)
+    verification_count = Column(Integer, default=0)
+    
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    inventory_item = relationship("InventoryItem")
+    supply_chain_events = relationship("SupplyChainEvent", back_populates="digital_product")
+
+class SupplyChainEvent(Base):
+    __tablename__ = "supply_chain_events"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    digital_product_id = Column(Integer, ForeignKey("digital_products.id"))
+    blockchain_transaction_id = Column(Integer, ForeignKey("blockchain_transactions.id"))
+    
+    # Event details
+    event_type = Column(String(50), nullable=False)  # MANUFACTURE, SHIP, RECEIVE, VERIFY, TRANSFER
+    event_description = Column(Text)
+    
+    # Location and time
+    location = Column(String(255))
+    latitude = Column(Float)
+    longitude = Column(Float)
+    event_timestamp = Column(DateTime, nullable=False)
+    
+    # Participants
+    actor_address = Column(String(42))  # Ethereum address
+    actor_name = Column(String(255))
+    actor_role = Column(String(50))  # MANUFACTURER, DISTRIBUTOR, RETAILER, CUSTOMER
+    
+    # Verification
+    is_verified = Column(Boolean, default=False)
+    verification_hash = Column(String(66))
+    
+    # Additional data
+    metadata = Column(JSON)
+    ipfs_hash = Column(String(100))  # For storing documents/images
+    
+    created_at = Column(DateTime, default=func.now())
+    
+    # Relationships
+    digital_product = relationship("DigitalProduct", back_populates="supply_chain_events")
+    blockchain_transaction = relationship("BlockchainTransaction")
+
+class BlockchainWallet(Base):
+    __tablename__ = "blockchain_wallets"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    wallet_address = Column(String(42), unique=True, nullable=False)
+    
+    # Wallet details
+    wallet_type = Column(String(50))  # SYSTEM, SUPPLIER, DISTRIBUTOR, RETAILER
+    entity_type = Column(String(50))  # WAREHOUSE, SUPPLIER, CUSTOMER
+    entity_id = Column(Integer)
+    
+    # Balance tracking (in Wei for precision)
+    native_balance = Column(String(50), default="0")
+    last_balance_update = Column(DateTime)
+    
+    # Security
+    is_active = Column(Boolean, default=True)
+    is_monitored = Column(Boolean, default=True)
+    
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+class BlockchainIntegration(Base):
+    __tablename__ = "blockchain_integrations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    integration_name = Column(String(100), nullable=False)
+    
+    # Configuration
+    network_id = Column(Integer, ForeignKey("blockchain_networks.id"))
+    smart_contract_id = Column(Integer, ForeignKey("smart_contracts.id"))
+    
+    # Integration settings
+    auto_sync_enabled = Column(Boolean, default=True)
+    sync_frequency = Column(Integer, default=300)  # seconds
+    last_sync = Column(DateTime)
+    
+    # Status
+    is_active = Column(Boolean, default=True)
+    sync_status = Column(String(20), default="IDLE")  # IDLE, SYNCING, ERROR
+    last_error = Column(Text)
+    
+    # Metrics
+    total_transactions = Column(Integer, default=0)
+    successful_transactions = Column(Integer, default=0)
+    failed_transactions = Column(Integer, default=0)
+    
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    network = relationship("BlockchainNetwork")
+    smart_contract = relationship("SmartContract")

@@ -21,6 +21,7 @@ from supply_chain_service import SupplyChainService
 from delivery_service import DeliveryService
 from ml_service import MLService
 from websocket_manager import ConnectionManager
+from blockchain_service import BlockchainService
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -79,6 +80,7 @@ inventory_service = InventoryService()
 supply_chain_service = SupplyChainService()
 delivery_service = DeliveryService()
 ml_service = MLService()
+blockchain_service = BlockchainService()
 
 # Background task for real-time updates
 async def periodic_updates():
@@ -268,6 +270,129 @@ async def health_check():
         "cors_fixed": True
     }
 
+# Blockchain Routes
+@app.get("/api/blockchain/networks", response_model=List[BlockchainNetworkSchema])
+async def get_blockchain_networks(db: Session = Depends(get_db)):
+    return blockchain_service.get_networks(db)
+
+@app.post("/api/blockchain/networks", response_model=BlockchainNetworkSchema)
+async def create_blockchain_network(network: BlockchainNetworkCreateSchema, db: Session = Depends(get_db)):
+    return blockchain_service.create_network(db, network)
+
+@app.get("/api/blockchain/contracts", response_model=List[SmartContractSchema])
+async def get_smart_contracts(db: Session = Depends(get_db)):
+    return blockchain_service.get_smart_contracts(db)
+
+@app.post("/api/blockchain/contracts", response_model=SmartContractSchema)
+async def create_smart_contract(contract: SmartContractCreateSchema, db: Session = Depends(get_db)):
+    return blockchain_service.create_smart_contract(db, contract)
+
+@app.get("/api/blockchain/transactions", response_model=List[BlockchainTransactionSchema])
+async def get_blockchain_transactions(limit: int = 100, db: Session = Depends(get_db)):
+    return blockchain_service.get_transactions(db, limit)
+
+@app.post("/api/blockchain/transactions", response_model=BlockchainTransactionSchema)
+async def create_blockchain_transaction(transaction: BlockchainTransactionCreateSchema, db: Session = Depends(get_db)):
+    return blockchain_service.create_transaction(db, transaction)
+
+@app.put("/api/blockchain/transactions/{tx_id}", response_model=BlockchainTransactionSchema)
+async def update_blockchain_transaction(tx_id: int, update_data: BlockchainTransactionUpdateSchema, db: Session = Depends(get_db)):
+    updated_tx = blockchain_service.update_transaction(db, tx_id, update_data)
+    if not updated_tx:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    return updated_tx
+
+@app.get("/api/blockchain/digital-products", response_model=List[DigitalProductSchema])
+async def get_digital_products(db: Session = Depends(get_db)):
+    return db.query(DigitalProduct).all()
+
+@app.post("/api/blockchain/digital-products", response_model=DigitalProductSchema)
+async def create_digital_product(product: DigitalProductCreateSchema, db: Session = Depends(get_db)):
+    return blockchain_service.create_digital_product(db, product)
+
+@app.get("/api/blockchain/digital-products/{product_id}", response_model=DigitalProductSchema)
+async def get_digital_product(product_id: int, db: Session = Depends(get_db)):
+    product = db.query(DigitalProduct).filter(DigitalProduct.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Digital product not found")
+    return product
+
+@app.post("/api/blockchain/digital-products/{product_id}/verify")
+async def verify_product_stage(product_id: int, verification: DigitalProductVerifySchema, db: Session = Depends(get_db)):
+    result = blockchain_service.verify_product_stage(
+        db, product_id, verification.stage, 
+        verification.location, verification.verified_by
+    )
+    if not result:
+        raise HTTPException(status_code=400, detail="Verification failed")
+    return {"message": "Product stage verified successfully"}
+
+@app.get("/api/blockchain/digital-products/{product_id}/tracking", response_model=List[SupplyChainEventSchema])
+async def get_product_tracking_history(product_id: int, db: Session = Depends(get_db)):
+    return blockchain_service.get_product_tracking_history(db, product_id)
+
+@app.post("/api/blockchain/supply-chain-events", response_model=SupplyChainEventSchema)
+async def create_supply_chain_event(event: SupplyChainEventCreateSchema, db: Session = Depends(get_db)):
+    return blockchain_service.create_supply_chain_event(db, event)
+
+@app.get("/api/blockchain/wallets", response_model=List[BlockchainWalletSchema])
+async def get_blockchain_wallets(db: Session = Depends(get_db)):
+    return blockchain_service.get_wallets(db)
+
+@app.post("/api/blockchain/wallets", response_model=BlockchainWalletSchema)
+async def create_blockchain_wallet(wallet: BlockchainWalletCreateSchema, db: Session = Depends(get_db)):
+    return blockchain_service.create_wallet(db, wallet)
+
+@app.get("/api/blockchain/integrations", response_model=List[BlockchainIntegrationSchema])
+async def get_blockchain_integrations(db: Session = Depends(get_db)):
+    return db.query(BlockchainIntegration).all()
+
+@app.post("/api/blockchain/integrations", response_model=BlockchainIntegrationSchema)
+async def create_blockchain_integration(integration: BlockchainIntegrationCreateSchema, db: Session = Depends(get_db)):
+    return blockchain_service.create_integration(db, integration)
+
+@app.post("/api/blockchain/integrations/{integration_id}/sync")
+async def sync_blockchain_integration(integration_id: int, db: Session = Depends(get_db)):
+    result = await blockchain_service.sync_blockchain_data(db, integration_id)
+    return {"message": "Sync completed" if result else "Sync failed", "success": result}
+
+@app.get("/api/blockchain/metrics", response_model=BlockchainMetricsSchema)
+async def get_blockchain_metrics(db: Session = Depends(get_db)):
+    return blockchain_service.get_blockchain_metrics(db)
+
+@app.get("/api/blockchain/supply-chain-analytics")
+async def get_blockchain_supply_chain_analytics(db: Session = Depends(get_db)):
+    return blockchain_service.get_supply_chain_analytics(db)
+
+@app.post("/api/blockchain/inventory/{item_id}/integrate")
+async def integrate_inventory_with_blockchain(item_id: int, db: Session = Depends(get_db)):
+    digital_product = blockchain_service.integrate_with_inventory(db, item_id)
+    if not digital_product:
+        raise HTTPException(status_code=404, detail="Inventory item not found")
+    return {"message": "Inventory item integrated with blockchain", "digital_product_id": digital_product.id}
+
+@app.post("/api/blockchain/simulate-transaction")
+async def simulate_blockchain_transaction(tx_data: dict):
+    result = await blockchain_service.simulate_blockchain_transaction(tx_data)
+    return result
+
+@app.get("/api/blockchain/connection-status")
+async def get_blockchain_connection_status(db: Session = Depends(get_db)):
+    networks = blockchain_service.get_networks(db)
+    connections = []
+    
+    for network in networks:
+        web3 = blockchain_service.get_web3_connection(network.id, db)
+        connections.append({
+            "network_id": network.id,
+            "network_name": network.name,
+            "is_connected": web3 is not None,
+            "chain_id": network.chain_id,
+            "is_testnet": network.is_testnet
+        })
+    
+    return {"connections": connections}
+
 # Root endpoint
 @app.get("/")
 async def root():
@@ -275,7 +400,14 @@ async def root():
         "message": "Welcome to Walmart Supply Chain Transformation Platform",
         "docs": "/docs",
         "redoc": "/redoc",
-        "status": "running"
+        "status": "running",
+        "features": {
+            "inventory_management": True,
+            "supply_chain_optimization": True,
+            "delivery_tracking": True,
+            "ml_analytics": True,
+            "blockchain_integration": True
+        }
     }
 
 if __name__ == "__main__":

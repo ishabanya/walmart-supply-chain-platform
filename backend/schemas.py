@@ -444,4 +444,235 @@ class RouteOptimizationResponse(BaseModel):
     total_distance: float
     estimated_duration: int
     fuel_savings: float
-    time_savings: int 
+    time_savings: int
+
+# Blockchain Schemas
+class BlockchainNetworkBase(BaseModel):
+    name: str
+    chain_id: int
+    rpc_url: str
+    explorer_url: Optional[str] = None
+    native_currency: Optional[str] = None
+    is_testnet: bool = False
+
+class BlockchainNetworkCreateSchema(BlockchainNetworkBase):
+    pass
+
+class BlockchainNetworkSchema(BlockchainNetworkBase):
+    id: int
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class SmartContractBase(BaseModel):
+    name: str
+    contract_address: str
+    network_id: int
+    contract_type: str
+    abi: Optional[Dict[str, Any]] = None
+    bytecode: Optional[str] = None
+
+class SmartContractCreateSchema(SmartContractBase):
+    pass
+
+class SmartContractDeploySchema(BaseModel):
+    deployed_at: datetime
+    deployed_by: str
+    deployment_tx_hash: str
+
+class SmartContractSchema(SmartContractBase):
+    id: int
+    deployed_at: Optional[datetime]
+    deployed_by: Optional[str]
+    deployment_tx_hash: Optional[str]
+    is_active: bool
+    is_verified: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class BlockchainTransactionBase(BaseModel):
+    from_address: str
+    to_address: str
+    function_name: Optional[str] = None
+    function_parameters: Optional[Dict[str, Any]] = None
+    entity_type: Optional[str] = None
+    entity_id: Optional[int] = None
+    action_type: Optional[str] = None
+
+class BlockchainTransactionCreateSchema(BlockchainTransactionBase):
+    network_id: int
+    smart_contract_id: Optional[int] = None
+
+class BlockchainTransactionUpdateSchema(BaseModel):
+    status: str
+    block_number: Optional[int] = None
+    block_hash: Optional[str] = None
+    gas_used: Optional[int] = None
+    gas_price: Optional[str] = None
+    transaction_fee: Optional[str] = None
+    confirmed_at: Optional[datetime] = None
+
+class BlockchainTransactionSchema(BlockchainTransactionBase):
+    id: int
+    tx_hash: str
+    network_id: int
+    smart_contract_id: Optional[int]
+    status: str
+    block_number: Optional[int]
+    block_hash: Optional[str]
+    gas_used: Optional[int]
+    gas_price: Optional[str]
+    transaction_fee: Optional[str]
+    submitted_at: datetime
+    confirmed_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class DigitalProductBase(BaseModel):
+    inventory_item_id: int
+    token_id: Optional[int] = None
+    contract_address: Optional[str] = None
+    blockchain_id: Optional[str] = None
+    current_owner: Optional[str] = None
+
+class DigitalProductCreateSchema(DigitalProductBase):
+    pass
+
+class DigitalProductVerifySchema(BaseModel):
+    stage: str  # MANUFACTURING, DISTRIBUTION, RETAIL
+    location: str
+    verified_by: str
+    verification_hash: str
+
+class DigitalProductSchema(DigitalProductBase):
+    id: int
+    digital_signature: Optional[str]
+    authenticity_hash: Optional[str]
+    origin_timestamp: Optional[datetime]
+    
+    # Verification stages
+    manufacturing_verified: bool
+    manufacturing_timestamp: Optional[datetime]
+    manufacturing_location: Optional[str]
+    
+    distribution_verified: bool
+    distribution_timestamp: Optional[datetime]
+    distribution_location: Optional[str]
+    
+    retail_verified: bool
+    retail_timestamp: Optional[datetime]
+    retail_location: Optional[str]
+    
+    is_authentic: bool
+    verification_count: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class SupplyChainEventBase(BaseModel):
+    digital_product_id: int
+    event_type: str
+    event_description: Optional[str] = None
+    location: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    event_timestamp: datetime
+    actor_address: Optional[str] = None
+    actor_name: Optional[str] = None
+    actor_role: Optional[str] = None
+
+class SupplyChainEventCreateSchema(SupplyChainEventBase):
+    pass
+
+class SupplyChainEventSchema(SupplyChainEventBase):
+    id: int
+    blockchain_transaction_id: Optional[int]
+    is_verified: bool
+    verification_hash: Optional[str]
+    metadata: Optional[Dict[str, Any]]
+    ipfs_hash: Optional[str]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class BlockchainWalletBase(BaseModel):
+    wallet_address: str
+    wallet_type: str
+    entity_type: Optional[str] = None
+    entity_id: Optional[int] = None
+
+class BlockchainWalletCreateSchema(BlockchainWalletBase):
+    pass
+
+class BlockchainWalletSchema(BlockchainWalletBase):
+    id: int
+    native_balance: str
+    last_balance_update: Optional[datetime]
+    is_active: bool
+    is_monitored: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class BlockchainIntegrationBase(BaseModel):
+    integration_name: str
+    network_id: int
+    smart_contract_id: int
+    auto_sync_enabled: bool = True
+    sync_frequency: int = 300
+
+class BlockchainIntegrationCreateSchema(BlockchainIntegrationBase):
+    pass
+
+class BlockchainIntegrationSchema(BlockchainIntegrationBase):
+    id: int
+    last_sync: Optional[datetime]
+    is_active: bool
+    sync_status: str
+    last_error: Optional[str]
+    total_transactions: int
+    successful_transactions: int
+    failed_transactions: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Blockchain API Request/Response Schemas
+class BlockchainProductTrackingSchema(BaseModel):
+    product_id: int
+    tracking_history: List[SupplyChainEventSchema]
+    current_stage: str
+    authenticity_verified: bool
+    blockchain_verified: bool
+
+class BlockchainMetricsSchema(BaseModel):
+    total_products_tracked: int
+    verified_products: int
+    total_transactions: int
+    successful_transactions: int
+    failed_transactions: int
+    network_status: str
+    last_sync: Optional[datetime]
+
+class Web3ConnectionSchema(BaseModel):
+    is_connected: bool
+    network_name: str
+    chain_id: int
+    account_address: Optional[str] = None
+    balance: Optional[str] = None
