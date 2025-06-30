@@ -13,6 +13,7 @@ import Orders from './pages/Orders';
 import Deliveries from './pages/Deliveries';
 import Analytics from './pages/Analytics';
 import Suppliers from './pages/Suppliers';
+import QuantumSupplyChain from './pages/QuantumSupplyChain';
 import Login from './pages/Login';
 
 // Context
@@ -184,6 +185,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Suppliers />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/quantum"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <QuantumSupplyChain />
                     </Layout>
                   </ProtectedRoute>
                 }
