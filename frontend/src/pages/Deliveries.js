@@ -29,7 +29,6 @@ import {
 } from '@mui/material';
 import {
   LocalShipping,
-  GPS,
   Schedule,
   CheckCircle,
   Cancel,
@@ -200,7 +199,7 @@ const Deliveries = () => {
           Delivery Management
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <GPS sx={{ color: '#4caf50' }} />
+          <LocationOn sx={{ color: '#4caf50' }} />
           <Typography variant="body2" color="text.secondary">
             Live tracking enabled
           </Typography>
@@ -510,7 +509,7 @@ const Deliveries = () => {
                     borderRadius: 2,
                     textAlign: 'center'
                   }}>
-                    <GPS sx={{ fontSize: 48, color: '#4caf50', mb: 1 }} />
+                    <LocationOn sx={{ fontSize: 48, color: '#4caf50', mb: 1 }} />
                     <Typography variant="body1">
                       GPS Coordinates: {selectedDelivery.current_lat}, {selectedDelivery.current_lng}
                     </Typography>
