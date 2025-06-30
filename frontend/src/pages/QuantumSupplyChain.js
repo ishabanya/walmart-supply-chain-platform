@@ -71,18 +71,57 @@ const QuantumSupplyChain = () => {
     quantumAdvantage: 23.4
   });
 
-  // Initialize quantum simulation
-  useEffect(() => {
-    initializeQuantumSystem();
-    const interval = setInterval(() => {
-      if (realTimeMode) {
-        updateQuantumStates();
-      }
-    }, 2000);
-    return () => clearInterval(interval);
-  }, [realTimeMode, updateQuantumStates]);
+  const generateProbabilityClouds = (states) => {
+    const clouds = [];
+    states.forEach(item => {
+      item.states.forEach((state, index) => {
+        clouds.push({
+          x: index * 100 + Math.random() * 80,
+          y: state.probability * 100 + Math.random() * 20,
+          z: Math.random() * 50 + 25,
+          item: item.name,
+          location: state.location,
+          probability: state.probability,
+          intensity: state.probability * 100,
+          radius: state.amplitude * 30 + 10
+        });
+      });
+    });
+    return clouds;
+  };
 
-  const initializeQuantumSystem = async () => {
+  const generateEntangledOrders = () => {
+    const orders = [
+      { id: 'EO001', items: ['Gaming Console', 'Wireless Headphones'], strength: 0.89, type: 'gaming-bundle' },
+      { id: 'EO002', items: ['Smart TV', 'Laptop'], strength: 0.76, type: 'home-office' },
+      { id: 'EO003', items: ['Smartphone', 'Wireless Headphones'], strength: 0.82, type: 'mobile-combo' },
+      { id: 'EO004', items: ['Gaming Console', 'Smart TV'], strength: 0.71, type: 'entertainment' },
+    ];
+    return orders.map(order => ({
+      ...order,
+      quantumCorrelation: order.strength,
+      bellState: order.strength > 0.8 ? 'maximal' : 'partial',
+      decoherenceTime: (1 - order.strength) * 10 + 2
+    }));
+  };
+
+  const generateWaveFunction = () => {
+    const points = [];
+    for (let i = 0; i < 100; i++) {
+      const x = i / 10;
+      const amplitude = Math.exp(-Math.pow(x - 5, 2) / 8) * Math.cos(2 * Math.PI * x / 3);
+      const probability = Math.pow(amplitude, 2);
+      points.push({
+        x: x,
+        amplitude: amplitude,
+        probability: probability,
+        phase: Math.atan2(Math.sin(2 * Math.PI * x / 3), Math.cos(2 * Math.PI * x / 3))
+      });
+    }
+    return points;
+  };
+
+  const initializeQuantumSystem = useCallback(async () => {
     setLoading(true);
     
     // Generate quantum inventory states
@@ -137,57 +176,7 @@ const QuantumSupplyChain = () => {
     setEntangledOrders(entangled);
     setWaveFunction(waves);
     setLoading(false);
-  };
-
-  const generateProbabilityClouds = (states) => {
-    const clouds = [];
-    states.forEach(item => {
-      item.states.forEach((state, index) => {
-        clouds.push({
-          x: index * 100 + Math.random() * 80,
-          y: state.probability * 100 + Math.random() * 20,
-          z: Math.random() * 50 + 25,
-          item: item.name,
-          location: state.location,
-          probability: state.probability,
-          intensity: state.probability * 100,
-          radius: state.amplitude * 30 + 10
-        });
-      });
-    });
-    return clouds;
-  };
-
-  const generateEntangledOrders = () => {
-    const orders = [
-      { id: 'EO001', items: ['Gaming Console', 'Wireless Headphones'], strength: 0.89, type: 'gaming-bundle' },
-      { id: 'EO002', items: ['Smart TV', 'Laptop'], strength: 0.76, type: 'home-office' },
-      { id: 'EO003', items: ['Smartphone', 'Wireless Headphones'], strength: 0.82, type: 'mobile-combo' },
-      { id: 'EO004', items: ['Gaming Console', 'Smart TV'], strength: 0.71, type: 'entertainment' },
-    ];
-    return orders.map(order => ({
-      ...order,
-      quantumCorrelation: order.strength,
-      bellState: order.strength > 0.8 ? 'maximal' : 'partial',
-      decoherenceTime: (1 - order.strength) * 10 + 2
-    }));
-  };
-
-  const generateWaveFunction = () => {
-    const points = [];
-    for (let i = 0; i < 100; i++) {
-      const x = i / 10;
-      const amplitude = Math.exp(-Math.pow(x - 5, 2) / 8) * Math.cos(2 * Math.PI * x / 3);
-      const probability = Math.pow(amplitude, 2);
-      points.push({
-        x: x,
-        amplitude: amplitude,
-        probability: probability,
-        phase: Math.atan2(Math.sin(2 * Math.PI * x / 3), Math.cos(2 * Math.PI * x / 3))
-      });
-    }
-    return points;
-  };
+  }, []);
 
   const updateQuantumStates = useCallback(() => {
     if (!simulationRunning) return;
@@ -217,6 +206,17 @@ const QuantumSupplyChain = () => {
       superpositionEfficiency: Math.max(0, prev.superpositionEfficiency + (Math.random() - 0.5) * 3),
     }));
   }, [simulationRunning]);
+
+  // Initialize quantum simulation
+  useEffect(() => {
+    initializeQuantumSystem();
+    const interval = setInterval(() => {
+      if (realTimeMode) {
+        updateQuantumStates();
+      }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [realTimeMode, initializeQuantumSystem, updateQuantumStates]);
 
   const handleWaveFunctionCollapse = async (itemId) => {
     setCollapseAnimation(true);
