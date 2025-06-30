@@ -60,6 +60,24 @@ const Deliveries = () => {
   const [chartData, setChartData] = useState([]);
   const [statusData, setStatusData] = useState([]);
 
+  const filterDeliveries = useCallback(() => {
+    let filtered = deliveries;
+
+    if (searchTerm) {
+      filtered = filtered.filter(delivery =>
+        delivery.id.toString().includes(searchTerm) ||
+        delivery.driver_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        delivery.customer_name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (statusFilter) {
+      filtered = filtered.filter(delivery => delivery.status === statusFilter);
+    }
+
+    setFilteredDeliveries(filtered);
+  }, [deliveries, searchTerm, statusFilter]);
+
   useEffect(() => {
     fetchDeliveries();
     const interval = setInterval(fetchDeliveries, 30000); // Update every 30 seconds
@@ -117,24 +135,6 @@ const Deliveries = () => {
       setLoading(false);
     }
   };
-
-  const filterDeliveries = useCallback(() => {
-    let filtered = deliveries;
-
-    if (searchTerm) {
-      filtered = filtered.filter(delivery =>
-        delivery.id.toString().includes(searchTerm) ||
-        delivery.driver_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        delivery.customer_name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (statusFilter) {
-      filtered = filtered.filter(delivery => delivery.status === statusFilter);
-    }
-
-    setFilteredDeliveries(filtered);
-  }, [deliveries, searchTerm, statusFilter]);
 
   const getStatusColor = (status) => {
     const colors = {

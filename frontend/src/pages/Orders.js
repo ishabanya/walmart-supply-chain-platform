@@ -60,6 +60,24 @@ const Orders = () => {
   });
   const [chartData, setChartData] = useState([]);
 
+  const filterOrders = useCallback(() => {
+    let filtered = orders;
+
+    if (searchTerm) {
+      filtered = filtered.filter(order =>
+        order.id.toString().includes(searchTerm) ||
+        order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customer_email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (statusFilter) {
+      filtered = filtered.filter(order => order.status === statusFilter);
+    }
+
+    setFilteredOrders(filtered);
+  }, [orders, searchTerm, statusFilter]);
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -105,24 +123,6 @@ const Orders = () => {
       setLoading(false);
     }
   };
-
-  const filterOrders = useCallback(() => {
-    let filtered = orders;
-
-    if (searchTerm) {
-      filtered = filtered.filter(order =>
-        order.id.toString().includes(searchTerm) ||
-        order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customer_email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (statusFilter) {
-      filtered = filtered.filter(order => order.status === statusFilter);
-    }
-
-    setFilteredOrders(filtered);
-  }, [orders, searchTerm, statusFilter]);
 
   const getStatusColor = (status) => {
     const colors = {

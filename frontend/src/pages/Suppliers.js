@@ -48,7 +48,7 @@ import {
   CheckCircle,
   Warning,
 } from '@mui/icons-material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 
 const Suppliers = () => {
@@ -69,6 +69,30 @@ const Suppliers = () => {
   });
   const [performanceData, setPerformanceData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
+
+  const filterSuppliers = useCallback(() => {
+    let filtered = suppliers;
+
+    if (searchTerm) {
+      filtered = filtered.filter(supplier =>
+        supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.contact_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.location.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (categoryFilter) {
+      filtered = filtered.filter(supplier => 
+        (supplier.category || 'General') === categoryFilter
+      );
+    }
+
+    if (statusFilter) {
+      filtered = filtered.filter(supplier => supplier.status === statusFilter);
+    }
+
+    setFilteredSuppliers(filtered);
+  }, [suppliers, searchTerm, categoryFilter, statusFilter]);
 
   useEffect(() => {
     fetchSuppliers();
@@ -128,30 +152,6 @@ const Suppliers = () => {
       setLoading(false);
     }
   };
-
-  const filterSuppliers = useCallback(() => {
-    let filtered = suppliers;
-
-    if (searchTerm) {
-      filtered = filtered.filter(supplier =>
-        supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        supplier.contact_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        supplier.location.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (categoryFilter) {
-      filtered = filtered.filter(supplier => 
-        (supplier.category || 'General') === categoryFilter
-      );
-    }
-
-    if (statusFilter) {
-      filtered = filtered.filter(supplier => supplier.status === statusFilter);
-    }
-
-    setFilteredSuppliers(filtered);
-  }, [suppliers, searchTerm, categoryFilter, statusFilter]);
 
   const getStatusColor = (status) => {
     const colors = {

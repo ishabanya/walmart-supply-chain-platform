@@ -74,14 +74,12 @@ const Analytics = () => {
       // Fetch multiple analytics endpoints in parallel
       const [
         performanceRes,
-        forecastRes,
         inventoryRes,
         ordersRes,
         deliveriesRes,
         suppliersRes
       ] = await Promise.all([
         axios.get(`${process.env.REACT_APP_API_URL}/api/analytics/performance`),
-        axios.get(`${process.env.REACT_APP_API_URL}/api/analytics/forecast`),
         axios.get(`${process.env.REACT_APP_API_URL}/api/inventory/items`),
         axios.get(`${process.env.REACT_APP_API_URL}/api/orders`),
         axios.get(`${process.env.REACT_APP_API_URL}/api/deliveries`),
