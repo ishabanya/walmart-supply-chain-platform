@@ -216,14 +216,20 @@ const Orders = () => {
     try {
       setLoading(true);
       
-      // Try to fetch from API first, fallback to sample data
-      let ordersData;
+      // Load sample data immediately
+      console.log('Loading sample orders data...');
+      let ordersData = sampleOrders;
+      
+      // Try to fetch from API (optional enhancement)
       try {
-        ordersData = await ApiService.getOrders();
-        console.log('Loaded orders from API:', ordersData.length);
+        const apiData = await Promise.race([
+          ApiService.getOrders(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('API timeout')), 3000))
+        ]);
+        console.log('Loaded orders from API:', apiData.length);
+        ordersData = apiData;
       } catch (apiError) {
-        console.log('API not available, using sample data');
-        ordersData = sampleOrders;
+        console.log('API not available, continuing with sample data');
       }
       
       setOrders(ordersData);
@@ -254,9 +260,18 @@ const Orders = () => {
       setChartData(chartData);
       
     } catch (error) {
-      console.error('Error fetching orders:', error);
-      // Fallback to sample data if everything fails
+      console.error('Error in fetchOrders:', error);
+      // Ensure sample data is loaded even if everything fails
       setOrders(sampleOrders);
+      const stats = {
+        total: sampleOrders.length,
+        pending: sampleOrders.filter(o => o.status === 'PENDING').length,
+        processing: sampleOrders.filter(o => o.status === 'PROCESSING').length,
+        shipped: sampleOrders.filter(o => o.status === 'SHIPPED').length,
+        delivered: sampleOrders.filter(o => o.status === 'DELIVERED').length,
+        cancelled: sampleOrders.filter(o => o.status === 'CANCELLED').length
+      };
+      setOrderStats(stats);
     } finally {
       setLoading(false);
     }
@@ -264,15 +279,22 @@ const Orders = () => {
 
   const fetchInventoryItems = async () => {
     try {
-      // Try to fetch inventory from API first, fallback to sample data
-      let inventoryData;
+      // Load sample data immediately
+      console.log('Loading sample inventory data...');
+      let inventoryData = sampleInventoryItems;
+      
+      // Try to fetch from API (optional enhancement)
       try {
-        inventoryData = await ApiService.getInventory();
-        console.log('Loaded inventory from API:', inventoryData.length);
+        const apiData = await Promise.race([
+          ApiService.getInventory(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('API timeout')), 3000))
+        ]);
+        console.log('Loaded inventory from API:', apiData.length);
+        inventoryData = apiData;
       } catch (apiError) {
-        console.log('API not available, using sample inventory data');
-        inventoryData = sampleInventoryItems;
+        console.log('API not available, continuing with sample inventory data');
       }
+      
       setInventoryItems(inventoryData);
     } catch (error) {
       console.error('Error fetching inventory:', error);
