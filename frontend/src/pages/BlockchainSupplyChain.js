@@ -132,7 +132,7 @@ const BlockchainSupplyChain = () => {
     setLoading(true);
     
     try {
-      const { name, place, address, description } = formData;
+      const { name, place, description } = formData;
       
       // Simulate blockchain transaction
       await new Promise(resolve => setTimeout(resolve, 2000));

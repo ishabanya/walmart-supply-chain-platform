@@ -1,25 +1,22 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
 import { AppBar, Toolbar, Typography } from '@mui/material';
 
 // Components
-import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
-import Inventory from './pages/Inventory';
 import Orders from './pages/Orders';
 import Deliveries from './pages/Deliveries';
 import Analytics from './pages/Analytics';
 import Suppliers from './pages/Suppliers';
 import QuantumSupplyChain from './pages/QuantumSupplyChain';
 import BlockchainSupplyChain from './pages/BlockchainSupplyChain';
-import Login from './pages/Login';
 
 // Context
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import { WebSocketProvider } from './context/WebSocketContext';
 import { BlockchainProvider } from './context/BlockchainContext';
 
@@ -80,38 +77,7 @@ const theme = createTheme({
   },
 });
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" />;
-};
-
-// Main Layout Component
-const Layout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
-
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <Navbar 
-        sidebarOpen={sidebarOpen} 
-        setSidebarOpen={setSidebarOpen} 
-      />
-      <Sidebar open={sidebarOpen} />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          mt: 8, // Account for navbar height
-          ml: sidebarOpen ? '240px' : '60px',
-          transition: 'margin-left 0.2s ease-in-out',
-        }}
-      >
-        {children}
-      </Box>
-    </Box>
-  );
-};
+// Main App Component
 
 function App() {
   return (

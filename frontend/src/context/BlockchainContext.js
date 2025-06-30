@@ -659,7 +659,7 @@ export const BlockchainProvider = ({ children }) => {
     };
     
     initialize();
-  }, []);
+  }, [initializeWeb3, loadBackendBlockchainData]);
 
   const value = {
     ...state,
