@@ -1,4 +1,5 @@
 import os
+import json
 from typing import List
 from pydantic_settings import BaseSettings
 
@@ -12,8 +13,23 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     
-    # CORS
-    allowed_origins: List[str] = ["http://localhost:3000"]
+    # CORS - can be overridden by ALLOWED_ORIGINS environment variable
+    allowed_origins: List[str] = [
+        "http://localhost:3000",
+        "https://walmart-supply-chain-platform.vercel.app",
+        "https://walmart-supply-chain-platform-git-master-ishabanya.vercel.app",
+        "https://walmart-supply-chain-platform-ishabanya.vercel.app"
+    ]
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Override allowed_origins from environment variable if present
+        if os.getenv("ALLOWED_ORIGINS"):
+            try:
+                self.allowed_origins = json.loads(os.getenv("ALLOWED_ORIGINS"))
+            except json.JSONDecodeError:
+                # If JSON parsing fails, treat as comma-separated string
+                self.allowed_origins = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS").split(",")]
     
     # Environment
     environment: str = "development"
