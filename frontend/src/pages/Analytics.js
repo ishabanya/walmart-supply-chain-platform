@@ -16,7 +16,6 @@ import {
   TableHead,
   TableRow,
   Chip,
-  Button,
   FormControl,
   InputLabel,
   Select,
@@ -30,11 +29,8 @@ import {
   Warning,
   CheckCircle,
   Timeline,
-  Assessment,
 } from '@mui/icons-material';
 import {
-  LineChart,
-  Line,
   AreaChart,
   Area,
   BarChart,
@@ -60,7 +56,6 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('7d');
   const [performanceData, setPerformanceData] = useState({});
-  const [forecastData, setForecastData] = useState([]);
   const [inventoryMetrics, setInventoryMetrics] = useState([]);
   const [orderTrends, setOrderTrends] = useState([]);
   const [deliveryMetrics, setDeliveryMetrics] = useState([]);
@@ -97,9 +92,8 @@ const Analytics = () => {
       const performance = performanceRes.data;
       setPerformanceData(performance);
 
-      // Process forecast data
-      const forecast = forecastRes.data;
-      setForecastData(forecast.predictions || []);
+      // Process forecast data (for future use)
+      // const forecast = forecastRes.data;
 
       // Process inventory metrics
       const inventory = inventoryRes.data;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container,
   Typography,
@@ -66,7 +66,7 @@ const Orders = () => {
 
   useEffect(() => {
     filterOrders();
-  }, [orders, searchTerm, statusFilter]);
+  }, [filterOrders]);
 
   const fetchOrders = async () => {
     try {
@@ -106,7 +106,7 @@ const Orders = () => {
     }
   };
 
-  const filterOrders = () => {
+  const filterOrders = useCallback(() => {
     let filtered = orders;
 
     if (searchTerm) {
@@ -122,7 +122,7 @@ const Orders = () => {
     }
 
     setFilteredOrders(filtered);
-  };
+  }, [orders, searchTerm, statusFilter]);
 
   const getStatusColor = (status) => {
     const colors = {

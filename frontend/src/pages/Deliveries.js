@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container,
   Typography,
@@ -37,7 +37,6 @@ import {
   Timer,
   Visibility,
   Phone,
-  Email,
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import axios from 'axios';
@@ -69,7 +68,7 @@ const Deliveries = () => {
 
   useEffect(() => {
     filterDeliveries();
-  }, [deliveries, searchTerm, statusFilter]);
+  }, [filterDeliveries]);
 
   const fetchDeliveries = async () => {
     try {
@@ -119,7 +118,7 @@ const Deliveries = () => {
     }
   };
 
-  const filterDeliveries = () => {
+  const filterDeliveries = useCallback(() => {
     let filtered = deliveries;
 
     if (searchTerm) {
@@ -135,7 +134,7 @@ const Deliveries = () => {
     }
 
     setFilteredDeliveries(filtered);
-  };
+  }, [deliveries, searchTerm, statusFilter]);
 
   const getStatusColor = (status) => {
     const colors = {
