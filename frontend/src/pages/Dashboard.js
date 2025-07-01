@@ -20,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
+import RealTimeTracker from '../components/RealTimeTracker';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -150,6 +151,13 @@ const Dashboard = () => {
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold', color: '#004c91' }}>
         Supply Chain Dashboard
       </Typography>
+      
+      {/* Real-Time Tracker */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12}>
+          <RealTimeTracker />
+        </Grid>
+      </Grid>
       
       <Grid container spacing={3}>
         {/* Stats Cards */}

@@ -41,6 +41,7 @@ import {
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import ApiService from '../services/ApiService';
+import RealTimeTracker from '../components/RealTimeTracker';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -439,12 +440,12 @@ const Orders = () => {
         Order Management
       </Typography>
 
-      {/* Debug info */}
-      <Box sx={{ mb: 2, p: 2, backgroundColor: '#f0f0f0', borderRadius: 1 }}>
-        <Typography variant="body2">
-          Debug: Orders loaded: {orders.length}, Filtered: {filteredOrders.length}, Loading: {loading.toString()}
-        </Typography>
-      </Box>
+      {/* Real-Time Tracker */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12}>
+          <RealTimeTracker type="orders" />
+        </Grid>
+      </Grid>
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
