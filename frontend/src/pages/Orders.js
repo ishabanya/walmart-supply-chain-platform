@@ -204,33 +204,23 @@ const Orders = () => {
   }, [orders, searchTerm, statusFilter]);
 
   useEffect(() => {
+    console.log('Orders component mounted, loading data...');
     fetchOrders();
     fetchInventoryItems();
-  }, []);
+  }, [fetchOrders, fetchInventoryItems]);
 
   useEffect(() => {
     filterOrders();
   }, [filterOrders]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
+      console.log('Fetching orders...');
       
-      // Load sample data immediately
-      console.log('Loading sample orders data...');
-      let ordersData = sampleOrders;
-      
-      // Try to fetch from API (optional enhancement)
-      try {
-        const apiData = await Promise.race([
-          ApiService.getOrders(),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('API timeout')), 3000))
-        ]);
-        console.log('Loaded orders from API:', apiData.length);
-        ordersData = apiData;
-      } catch (apiError) {
-        console.log('API not available, continuing with sample data');
-      }
+      // For now, just use sample data directly to test
+      const ordersData = sampleOrders;
+      console.log('Using sample orders:', ordersData.length);
       
       setOrders(ordersData);
 
@@ -260,47 +250,25 @@ const Orders = () => {
       setChartData(chartData);
       
     } catch (error) {
-      console.error('Error in fetchOrders:', error);
-      // Ensure sample data is loaded even if everything fails
+      console.error('Error fetching orders:', error);
+      // Fallback to sample data if everything fails
       setOrders(sampleOrders);
-      const stats = {
-        total: sampleOrders.length,
-        pending: sampleOrders.filter(o => o.status === 'PENDING').length,
-        processing: sampleOrders.filter(o => o.status === 'PROCESSING').length,
-        shipped: sampleOrders.filter(o => o.status === 'SHIPPED').length,
-        delivered: sampleOrders.filter(o => o.status === 'DELIVERED').length,
-        cancelled: sampleOrders.filter(o => o.status === 'CANCELLED').length
-      };
-      setOrderStats(stats);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchInventoryItems = async () => {
+  const fetchInventoryItems = useCallback(async () => {
     try {
-      // Load sample data immediately
-      console.log('Loading sample inventory data...');
-      let inventoryData = sampleInventoryItems;
-      
-      // Try to fetch from API (optional enhancement)
-      try {
-        const apiData = await Promise.race([
-          ApiService.getInventory(),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('API timeout')), 3000))
-        ]);
-        console.log('Loaded inventory from API:', apiData.length);
-        inventoryData = apiData;
-      } catch (apiError) {
-        console.log('API not available, continuing with sample inventory data');
-      }
-      
+      // For now, just use sample data directly to test
+      const inventoryData = sampleInventoryItems;
+      console.log('Using sample inventory:', inventoryData.length);
       setInventoryItems(inventoryData);
     } catch (error) {
       console.error('Error fetching inventory:', error);
       setInventoryItems(sampleInventoryItems);
     }
-  };
+  }, []);
 
   const handleOpenAddDialog = () => {
     setOpenAddDialog(true);
@@ -450,11 +418,16 @@ const Orders = () => {
     });
   };
 
+  console.log('Rendering Orders component. Loading:', loading, 'Orders count:', orders.length);
+
   if (loading) {
     return (
       <Container maxWidth="xl">
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
           <CircularProgress size={60} sx={{ color: '#004c91' }} />
+          <Typography variant="h6" sx={{ ml: 2, color: '#004c91' }}>
+            Loading Orders...
+          </Typography>
         </Box>
       </Container>
     );
@@ -465,6 +438,13 @@ const Orders = () => {
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold', color: '#004c91' }}>
         Order Management
       </Typography>
+
+      {/* Debug info */}
+      <Box sx={{ mb: 2, p: 2, backgroundColor: '#f0f0f0', borderRadius: 1 }}>
+        <Typography variant="body2">
+          Debug: Orders loaded: {orders.length}, Filtered: {filteredOrders.length}, Loading: {loading.toString()}
+        </Typography>
+      </Box>
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
